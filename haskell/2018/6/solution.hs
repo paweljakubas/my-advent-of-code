@@ -26,7 +26,15 @@ main = do
     _       -> print "Waiting for one command argument either 'part1' or 'part2'"
 
 part2 :: IO ()
-part2 = undefined
+part2
+    = print
+    . length
+    . filter (\(_x, _y, dist) -> dist < 10000)
+    . calculateDist
+    . getSurfaceCoords
+    . Maybe.mapMaybe (Read.readMaybe @Coordinate)
+    . lines
+    =<< getContents
 
 part1 :: IO ()
 part1
@@ -61,6 +69,19 @@ getSurface :: (Word, Word) -> [(Word,Word)]
 getSurface (width, height) =
   (,) <$> [ 0 .. width + 1 ] <*> [ 0 .. height + 1 ]
 
+getSurfaceCoords coords =
+  (\pair -> (getSurface pair,coords)) $
+  uncurry (,) $
+  (optimum fst &&& optimum snd) coords
+  where
+    optimum f = maximum . map (\(Coordinate pair) -> f pair)
+
+calculateDist (surface, coords) =
+  map addDistFromCoords surface
+  where
+    addDistFromCoords (x,y) =
+      (x,y, foldr (\coord acc -> acc + manhattanDist (x,y) coord) 0 coords)
+
 getBoundaries coords =
   (\pair -> (pair, getSurface pair,coords)) $
   uncurry (,) $
@@ -68,13 +89,17 @@ getBoundaries coords =
   where
     optimum f = maximum . map (\(Coordinate pair) -> f pair)
 
-calculateClosestCoord coords (x,y) =
-    analyzeClosest $ L.sortOn fst $ map dist coords
+manhattanDist (x,y) (Coordinate coord@(cx, cy)) =
+  abs' x cx + abs' y cy
   where
     abs' x y =
       if x >= y then x - y
       else y - x
-    dist (Coordinate coord@(cx, cy)) = (abs' x cx + abs' y cy, coord)
+
+calculateClosestCoord coords (x,y) =
+    analyzeClosest $ L.sortOn fst $ map dist coords
+  where
+    dist c@(Coordinate coord) = (manhattanDist (x,y) c, coord)
     analyzeClosest ((_d,coord):[]) = ((x,y), Just coord)
     analyzeClosest a@((d1,coord):(d2,_):_) =
       if d1 == d2 then ((x,y),Nothing)
