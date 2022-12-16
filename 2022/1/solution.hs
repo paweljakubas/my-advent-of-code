@@ -7,6 +7,7 @@
 
 
 import qualified Data.Char                    as Char
+import qualified Data.List                    as L
 import qualified Data.Maybe                   as Maybe
 import           System.Environment           (getArgs)
 import qualified Text.ParserCombinators.ReadP as Parse
@@ -26,7 +27,12 @@ main = do
     _       -> print "Waiting for one command argument either 'part1' or 'part2'"
 
 part2 :: IO ()
-part2 = undefined
+part2
+    = print
+    . fmap (sum . L.take 3 . L.reverse . L.sort . calCalories)
+    . Read.readMaybe @ItemList
+    =<< getContents
+
 
 part1 :: IO ()
 part1
