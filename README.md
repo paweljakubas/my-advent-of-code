@@ -8,3 +8,11 @@ cat input.txt | stack solution.hs "part2"
 ```
 0!:1 < 'solution.ijs'
 ```
+
+### Running Q code
+```
+// testing any file
+q solution.q -q -filename "inputTest1.txt"
+// testing "production" file
+q solution.q -q
+```
