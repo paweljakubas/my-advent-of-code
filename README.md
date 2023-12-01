@@ -16,3 +16,9 @@ q solution.q -q -filename "inputTest1.txt"
 // testing "production" file
 q solution.q -q
 ```
+
+### Running Rust code
+```
+// before you run first time: cargo install rust-script
+./solution.rs
+```
