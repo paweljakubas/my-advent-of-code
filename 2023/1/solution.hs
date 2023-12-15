@@ -1,12 +1,14 @@
 #!/usr/bin/env stack
 -- stack --resolver lts-18.13 script
 
-{-# LANGUAGE LambdaCase       #-}
-{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE LambdaCase        #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications  #-}
 
 import           Control.Arrow                ((&&&))
 import qualified Data.Char                    as Char
 import qualified Data.Maybe                   as Maybe
+import qualified Data.Text                    as T
 import           System.Environment           (getArgs)
 import qualified Text.ParserCombinators.ReadP as Parse
 import qualified Text.Read                    as Read
@@ -25,7 +27,14 @@ main = do
     _       -> print "Waiting for one command argument either 'part1' or 'part2'"
 
 part2 :: IO ()
-part2 = undefined
+part2
+    = print
+    . sum
+    . map extractTwoDigitsNum
+    . Maybe.mapMaybe (Read.readMaybe @DigitsInLine)
+    . map replaceLine
+    . lines
+    =<< getContents
 
 part1 :: IO ()
 part1
@@ -39,6 +48,28 @@ part1
 data DigitsInLine
   = DigitsInLine { digits :: [Word] }
   deriving Show
+
+replaceVector :: [(T.Text, T.Text)]
+replaceVector =
+    [ ("one", "o1e")
+    , ("two", "t2o")
+    , ("three", "t3e")
+    , ("four", "f4r")
+    , ("five", "f5e")
+    , ("six", "s6x")
+    , ("seven", "s7n")
+    , ("eight", "e8t")
+    , ("nine", "n9e")
+    ]
+
+replaceLine :: String -> String
+replaceLine =
+    T.unpack
+    . replaceOneByOne
+    . T.pack
+  where
+    replaceOneByOne txt =
+        foldr (\(from, to) txt' -> T.replace from to txt') txt replaceVector
 
 extractTwoDigitsNum :: DigitsInLine -> Word
 extractTwoDigitsNum =
