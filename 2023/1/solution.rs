@@ -44,15 +44,30 @@ fn lines_parser(input: &str) -> IResult<&str, Vec<u32>> {
     separated_list1(newline, two_digits_parser)(input)
 }
 
-fn main() {
-    let res = lines_parser("a12a45\n");
-    println!("Res: {:?}", res);
+type CustomizedResult<T> = Result<T, Box<dyn std::error::Error>>;
+
+fn main() -> CustomizedResult<()> {
+    let args: Vec<String> = std::env::args().collect();
+    match &args[..] {
+        [_name, filename, part] => {
+            println!("filename: {:?}, part: {:?}", filename, part);
+            let input = std::fs::read_to_string(filename)?;
+            println!("parsed: {:?}", lines_parser(&input));
+            Ok(())
+        }
+        _ => {
+            println!("Error: filename and part1/part2 are expected");
+            Ok(())
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
 
     use crate::{digit_line_parser, lines_parser, two_chars_parser, two_digits_parser};
+
+    type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
     #[test]
     fn can_parse_line() {
@@ -88,5 +103,13 @@ mod tests {
         assert_eq!(Ok(("", vec![12, 22])), lines_parser(str));
         str = "a12b3c45d\n12a\na12b3c40d\nzzzzz1ababaab";
         assert_eq!(Ok(("", vec![15, 12, 10, 11])), lines_parser(str));
+    }
+
+    #[test]
+    fn sample_test1() -> TestResult<()> {
+        let input =
+            std::fs::read_to_string("/home/pawel/Work/my-advent-of-code/2023/1/sample1.txt")?;
+        assert_eq!(Ok(("\n", vec![12, 38, 15, 77])), lines_parser(&input));
+        Ok(())
     }
 }
