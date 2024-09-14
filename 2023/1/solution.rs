@@ -42,6 +42,29 @@ fn lines_parser(input: &str) -> IResult<&str, Vec<u32>> {
     separated_list1(newline, two_digits_parser)(input)
 }
 
+fn part1(input: &str) {
+    if let Ok((_, ints)) = lines_parser(input) {
+        println!("{}", ints.iter().sum::<u32>());
+    }
+}
+
+fn part2(input: String) -> String {
+    let to_replace = [
+        ("one", "o1e"),
+        ("two", "t2o"),
+        ("three", "t3e"),
+        ("four", "f4r"),
+        ("five", "f5e"),
+        ("six", "s6x"),
+        ("seven", "s7n"),
+        ("eight", "e8t"),
+        ("nine", "n9e"),
+    ];
+    to_replace
+        .iter()
+        .fold(input, |acc, (from, to)| acc.replace(from, to))
+}
+
 type CustomizedResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 fn main() -> CustomizedResult<()> {
@@ -50,11 +73,10 @@ fn main() -> CustomizedResult<()> {
         [_name, filename, part] => {
             let input = std::fs::read_to_string(filename)?;
             if part == "part1" {
-                if let Ok((_, ints)) = lines_parser(&input) {
-                    println!("{}", ints.iter().sum::<u32>());
-                }
+                part1(&input);
                 Ok(())
             } else if part == "part2" {
+                println!("{:?}", part1(&part2(input)));
                 Ok(())
             } else {
                 println!("Error: Either part1 or part2 are expected");
