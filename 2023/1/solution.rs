@@ -42,9 +42,11 @@ fn lines_parser(input: &str) -> IResult<&str, Vec<u32>> {
     separated_list1(newline, two_digits_parser)(input)
 }
 
-fn part1(input: &str) {
+fn part1(input: &str) -> u32 {
     if let Ok((_, ints)) = lines_parser(input) {
-        println!("{}", ints.iter().sum::<u32>());
+        ints.iter().sum::<u32>()
+    } else {
+        0
     }
 }
 
@@ -73,10 +75,10 @@ fn main() -> CustomizedResult<()> {
         [_name, filename, part] => {
             let input = std::fs::read_to_string(filename)?;
             if part == "part1" {
-                part1(&input);
+                println!("{}", part1(&input));
                 Ok(())
             } else if part == "part2" {
-                println!("{:?}", part1(&part2(input)));
+                println!("{}", part1(&part2(input)));
                 Ok(())
             } else {
                 println!("Error: Either part1 or part2 are expected");
@@ -93,7 +95,9 @@ fn main() -> CustomizedResult<()> {
 #[cfg(test)]
 mod tests {
 
-    use crate::{digit_line_parser, lines_parser, two_chars_parser, two_digits_parser};
+    use crate::{
+        digit_line_parser, lines_parser, part1, part2, two_chars_parser, two_digits_parser,
+    };
 
     type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
@@ -158,10 +162,37 @@ mod tests {
     }
 
     #[test]
-    fn sample_test1() -> TestResult<()> {
+    fn sample_test1a() -> TestResult<()> {
         let input =
             std::fs::read_to_string("/home/pawel/Work/my-advent-of-code/2023/1/sample1.txt")?;
         assert_eq!(Ok(("\n", vec![12, 38, 15, 77])), lines_parser(&input));
+        Ok(())
+    }
+
+    #[test]
+    fn sample_test1b() -> TestResult<()> {
+        let input =
+            std::fs::read_to_string("/home/pawel/Work/my-advent-of-code/2023/1/sample1.txt")?;
+        assert_eq!(142, part1(&input));
+        Ok(())
+    }
+
+    #[test]
+    fn sample_test2a() -> TestResult<()> {
+        let input =
+            std::fs::read_to_string("/home/pawel/Work/my-advent-of-code/2023/1/sample2.txt")?;
+        assert_eq!(
+            "t2o1n9e\ne8t2ot3e\nabco1e2t3exyz\nxt2o1e3f4r\n4n9ee8ts7n2\nzo1e8t234\n7pqrsts6xteen\n",
+            part2(input)
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn sample_test2b() -> TestResult<()> {
+        let input =
+            std::fs::read_to_string("/home/pawel/Work/my-advent-of-code/2023/1/sample2.txt")?;
+        assert_eq!(281, part1(&part2(input)));
         Ok(())
     }
 }
