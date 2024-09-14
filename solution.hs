@@ -1,5 +1,7 @@
 #!/usr/bin/env stack
--- stack --resolver lts-18.13 script
+{- stack script --resolver lts-22.21
+   --package containers
+-}
 
 {-# LANGUAGE TypeApplications #-}
 
