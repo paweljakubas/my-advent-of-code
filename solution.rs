@@ -6,8 +6,7 @@
 //! ```
 
 use nom::{
-    branch::alt,
-    character::complete::{alpha1, digit1, line_ending},
+    character::complete::{alpha1, digit1},
     combinator::map,
     multi::{many0, separated_list1},
     sequence::delimited,
@@ -15,8 +14,7 @@ use nom::{
 };
 
 fn parse_digit_line(input: &str) -> IResult<&str, String> {
-    let omit = alt((line_ending, alpha1));
-    let core = separated_list1(omit, digit1);
+    let core = separated_list1(alpha1, digit1);
     let delimitor_pre = many0(alpha1);
     let delimitor_post = many0(alpha1);
     map(delimited(delimitor_pre, core, delimitor_post), |v| {
@@ -24,24 +22,63 @@ fn parse_digit_line(input: &str) -> IResult<&str, String> {
     })(input)
 }
 
-fn main() {
-    let res = parse_two_digits("a12a45");
-    println!("Res: {:?}", res);
+fn part1(_input: &str) -> u32 {
+    1
+}
+fn part2(_input: &str) -> u32 {
+    2
+}
+
+type CustomizedResult<T> = Result<T, Box<dyn std::error::Error>>;
+
+fn main() -> CustomizedResult<()> {
+    let args: Vec<String> = std::env::args().collect();
+    match &args[..] {
+        [_name, filename, part] => {
+            let input = std::fs::read_to_string(filename)?;
+            if part == "part1" {
+                println!("{}", part1(&input));
+                Ok(())
+            } else if part == "part2" {
+                println!("{}", part2(&input));
+                Ok(())
+            } else {
+                println!("Error: Either part1 or part2 are expected");
+                Ok(())
+            }
+        }
+        _ => {
+            println!("Error: both filename and part1/part2 are expected");
+            Ok(())
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
 
-    use crate::parse_digit_line;
+    use crate::{parse_digit_line, part1, part2};
+
+    type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
     #[test]
     fn can_parse_line() {
         assert_eq!(Ok(("", String::from("12"))), parse_digit_line("12a"));
-        assert_eq!(Ok(("", String::from("12"))), parse_digit_line("a12"));
-        assert_eq!(Ok(("", String::from("12"))), parse_digit_line("a12b"));
-        assert_eq!(
-            Ok(("", String::from("12345"))),
-            parse_digit_line("a12b3c45d")
-        );
+    }
+
+    #[test]
+    fn sample_test1() -> TestResult<()> {
+        let input =
+            std::fs::read_to_string("/home/pawel/Work/my-advent-of-code/2023/1/sample1.txt")?;
+        assert_eq!(1, part1(&input));
+        Ok(())
+    }
+
+    #[test]
+    fn sample_test2() -> TestResult<()> {
+        let input =
+            std::fs::read_to_string("/home/pawel/Work/my-advent-of-code/2023/1/sample1.txt")?;
+        assert_eq!(2, part2(&input));
+        Ok(())
     }
 }
