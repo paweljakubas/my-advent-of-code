@@ -33,7 +33,22 @@ main = do
     _       -> print "Waiting for one command argument either 'part1', 'part2' or 'tests'"
 
 part2 :: IO ()
-part2 = undefined
+part2 =
+      print
+    . sum
+    . map (productCube . coalesceGame)
+    . Maybe.mapMaybe (Read.readMaybe @Game)
+    . lines
+    =<< getContents
+
+productCube :: GameCoalesed -> Word
+productCube (GameCoalesed _ (Cube themap)) =
+    product $ Map.elems themap
+
+coalesceGame :: Game -> GameCoalesed
+coalesceGame (Game num cubes) =
+    let aggr = foldr (Map.unionWith max . unCube) Map.empty cubes
+    in GameCoalesed num (Cube aggr)
 
 part1 :: IO ()
 part1 =
@@ -112,3 +127,5 @@ parserGame = do
 
 instance Read Game where
   readsPrec _ = Parse.readP_to_S parserGame
+
+data GameCoalesed = GameCoalesed {theid :: Word, cube :: Cube} deriving (Eq, Show)
