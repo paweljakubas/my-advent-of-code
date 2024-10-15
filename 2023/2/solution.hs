@@ -39,9 +39,8 @@ part1 :: IO ()
 part1 =
       print
     . sum
-    . map theid
-    . filter (\(GameCoalesed _ game) -> foldr (\pair res -> res && within pair game) True limit)
-    . map coalesceGame
+    . map num
+    . filter (\(Game _ games) -> foldr (\game res -> res && checkGame game) True games)
     . Maybe.mapMaybe (Read.readMaybe @Game)
     . lines
     =<< getContents
@@ -50,11 +49,7 @@ part1 =
    within (key, threshold) (Cube themap) = case Map.lookup key themap of
        Nothing  -> True
        Just val -> val <= threshold
-
-coalesceGame :: Game -> GameCoalesed
-coalesceGame (Game num cubes) =
-    let aggr = foldr (Map.unionWith (+) . unCube) Map.empty cubes
-    in GameCoalesed num (Cube aggr)
+   checkGame cube = foldr (\pair res -> res && within pair cube) True limit
 
 testing :: IO ()
 testing = do
@@ -117,5 +112,3 @@ parserGame = do
 
 instance Read Game where
   readsPrec _ = Parse.readP_to_S parserGame
-
-data GameCoalesed = GameCoalesed {theid :: Word, cube :: Cube} deriving (Eq, Show)
