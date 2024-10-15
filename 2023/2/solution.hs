@@ -132,8 +132,8 @@ data Cube = Cube {unCube :: Map.Map String Word} deriving (Eq, Show)
 parserNum :: Parse.ReadP Word
 parserNum = fmap read (Parse.munch1 Char.isDigit)
 
-parserClaim :: Parse.ReadP Cube
-parserClaim = do
+parserCube :: Parse.ReadP Cube
+parserCube = do
     Parse.skipSpaces
     colorNumPairs <- Parse.sepBy1 validColorParser (Parse.string ",")
     pure $ Cube $ foldr (uncurry Map.insert) Map.empty colorNumPairs
@@ -148,7 +148,7 @@ parserClaim = do
        Parse.choice [colorParser "blue", colorParser "red", colorParser "green"]
 
 instance Read Cube where
-  readsPrec _ = Parse.readP_to_S parserClaim
+  readsPrec _ = Parse.readP_to_S parserCube
 
 data Game = Game {num :: Word, cubes :: [Cube]} deriving (Eq, Show)
 
@@ -160,7 +160,7 @@ parserGame = do
     num <- parserNum
     _ <- Parse.string ":"
     Parse.skipSpaces
-    cubes <- Parse.sepBy1 parserClaim (Parse.string ";")
+    cubes <- Parse.sepBy1 parserCube (Parse.string ";")
     pure $ Game num cubes
 
 instance Read Game where

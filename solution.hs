@@ -1,13 +1,19 @@
 #!/usr/bin/env stack
-{- stack script --resolver lts-22.21
-   --package containers
+{- stack script
+   --resolver lts-22.37
+   --package "containers HUnit"
+   --ghc-options -Wall
 -}
 
 {-# LANGUAGE TypeApplications #-}
 
 import qualified Data.Char                    as Char
+import qualified Data.Map.Strict              as Map
 import qualified Data.Maybe                   as Maybe
 import           System.Environment           (getArgs)
+import qualified System.Exit                  as Exit
+import           Test.HUnit                   (Test (..), failures, runTestTT,
+                                               (@?=))
 import qualified Text.ParserCombinators.ReadP as Parse
 import qualified Text.Read                    as Read
 
@@ -17,39 +23,58 @@ main = do
   case args of
     [arg] ->
       if arg == "part1" then
-        part1
+          part1
       else if arg == "part2" then
-        part2
+          part2
+      else if arg == "tests" then
+          testing
       else
-        print "Waiting for 'part1' or 'part2'"
-    _       -> print "Waiting for one command argument either 'part1' or 'part2'"
+          print "Waiting for 'part1', 'part2' or 'tests'"
+    _       -> print "Waiting for one command argument either 'part1', 'part2' or 'tests'"
 
 part2 :: IO ()
-part2 = undefined
-
-part1 :: IO ()
-part1
-    = print
-    . Maybe.mapMaybe (Read.readMaybe @Claim)
+part2 =
+      print
+    . part2Logic
+    . Maybe.mapMaybe (Read.readMaybe @Something)
     . lines
     =<< getContents
 
-data Claim
-  = Claim Word Word Word Word Word
-  deriving Show
+part2Logic :: [Something] -> Word
+part2Logic = undefined
+
+part1 :: IO ()
+part1 =
+      print
+    . part1Logic
+    . Maybe.mapMaybe (Read.readMaybe @Something)
+    . lines
+    =<< getContents
+
+part1Logic :: [Something] -> Word
+part1Logic = undefined
+
+testing :: IO ()
+testing = do
+    result <- runTestTT testSuite
+    if failures result > 0 then Exit.exitFailure else Exit.exitSuccess
+ where
+    testSuite = TestList
+        [ TestLabel "1 is 1" testOne
+        ]
+    testOne = TestCase $ (1::Word) @?= (1::Word)
+
+data Something =
+    Something {unSomething :: Map.Map String Word} deriving (Eq, Show)
 
 parserNum :: Parse.ReadP Word
 parserNum = fmap read (Parse.munch1 Char.isDigit)
 
-parserClaim :: Parse.ReadP Claim
-parserClaim = do
-    Parse.string "#"
-    theid <- parserNum
-    Parse.string " @ "
-    [left,top] <- Parse.sepBy1 parserNum (Parse.string ",")
-    Parse.string ": "
-    [width,height] <- Parse.sepBy1 parserNum (Parse.string "x")
-    pure $ Claim theid left top width height
+parserSomething :: Parse.ReadP Something
+parserSomething = do
+    Parse.skipSpaces
+    num <- parserNum
+    pure $ Something $ Map.fromList [("something", num)]
 
-instance Read Claim where
-  readsPrec _ = Parse.readP_to_S parserClaim
+instance Read Something where
+  readsPrec _ = Parse.readP_to_S parserSomething
