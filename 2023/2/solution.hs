@@ -35,11 +35,15 @@ main = do
 part2 :: IO ()
 part2 =
       print
-    . sum
-    . map (productCube . coalesceGame)
+    . part2Logic
     . Maybe.mapMaybe (Read.readMaybe @Game)
     . lines
     =<< getContents
+
+part2Logic :: [Game] -> Word
+part2Logic =
+      sum
+    . map (productCube . coalesceGame)
 
 productCube :: GameCoalesed -> Word
 productCube (GameCoalesed _ (Cube themap)) =
@@ -53,12 +57,16 @@ coalesceGame (Game num cubes) =
 part1 :: IO ()
 part1 =
       print
-    . sum
-    . map num
-    . filter (\(Game _ games) -> foldr (\game res -> res && checkGame game) True games)
+    . part1Logic
     . Maybe.mapMaybe (Read.readMaybe @Game)
     . lines
     =<< getContents
+
+part1Logic :: [Game] -> Word
+part1Logic =
+      sum
+    . map num
+    . filter (\(Game _ games) -> foldr (\game res -> res && checkGame game) True games)
  where
    limit = [("blue", 14),("red", 12),("green", 13)]
    within (key, threshold) (Cube themap) = case Map.lookup key themap of
@@ -75,7 +83,9 @@ testing = do
         [ TestLabel "can read red" testRed
         , TestLabel "can read blue" testBlue
         , TestLabel "can read green" testGreen
-        , TestLabel "can read game 1" testGame1
+        , TestLabel "can read game" testGame1
+        , TestLabel "part1 logic for sample is fine" testLogic1
+        , TestLabel "part2 logic for sample is fine" testLogic2
         ]
     testRed = TestCase $ (read @Cube " 10 red") @?= (Cube $ Map.fromList [("red", 10)])
     testBlue = TestCase $ (read @Cube " 11 blue") @?= (Cube $ Map.fromList [("blue", 11)])
@@ -88,6 +98,34 @@ testing = do
          , Cube $ Map.fromList [("red", 1),("green", 2),("blue", 6)]
          , Cube $ Map.fromList [("green", 2)]]
         )
+    sample = [
+          Game 1
+         [ Cube $ Map.fromList [("blue", 3),("red", 4)]
+         , Cube $ Map.fromList [("red", 1),("green", 2),("blue", 6)]
+         , Cube $ Map.fromList [("green", 2)]
+         ]
+        , Game 2
+         [ Cube $ Map.fromList [("blue", 1),("green", 2)]
+         , Cube $ Map.fromList [("red", 1),("green", 3),("blue", 4)]
+         , Cube $ Map.fromList [("green", 1),("blue", 1)]
+         ]
+        , Game 3
+         [ Cube $ Map.fromList [("blue", 6),("green", 8),("red", 20)]
+         , Cube $ Map.fromList [("red", 4),("green", 13),("blue", 5)]
+         , Cube $ Map.fromList [("green", 5),("red", 1)]
+         ]
+        , Game 4
+         [ Cube $ Map.fromList [("blue", 6),("green", 1),("red", 3)]
+         , Cube $ Map.fromList [("red", 6),("green", 3)]
+         , Cube $ Map.fromList [("green", 3),("red", 14),("blue", 15)]
+         ]
+        , Game 5
+         [ Cube $ Map.fromList [("blue", 1),("green", 3),("red", 6)]
+         , Cube $ Map.fromList [("green", 2),("red", 1),("blue", 2)]
+         ]
+        ]
+    testLogic1 = TestCase $ (part1Logic sample) @?= 8
+    testLogic2 = TestCase $ (part2Logic sample) @?= 2286
 
 data Cube = Cube {unCube :: Map.Map String Word} deriving (Eq, Show)
 
