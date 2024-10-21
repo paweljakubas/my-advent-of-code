@@ -1,6 +1,8 @@
 #!/usr/bin/env stack
 {- stack script --resolver lts-22.21
-   --package text
+   --resolver lts-22.37
+   --package "text"
+   --ghc-options -Wall
 -}
 
 {-# LANGUAGE LambdaCase        #-}
