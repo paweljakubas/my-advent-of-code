@@ -143,7 +143,6 @@ fn is_each_valid(game: &Game) -> bool {
 
 fn part1(input: &str) -> u32 {
     if let Ok((_, games)) = games_parser(input) {
-        println!("games: {:?}", games);
         games
             .iter()
             .filter(|&game| is_each_valid(&game))
@@ -153,8 +152,61 @@ fn part1(input: &str) -> u32 {
         0
     }
 }
-fn part2(_input: &str) -> u32 {
-    2
+
+#[derive(Debug, PartialEq)]
+struct GameCoalesed {
+    id: u32,
+    cube: Cube,
+}
+
+fn update_hashmap(
+    mut to_update: HashMap<String, u32>,
+    cube_updating: &Cube,
+) -> HashMap<String, u32> {
+    for (key, val) in to_update.iter_mut() {
+        if let Some(val_cand) = (*cube_updating).cube.get(key) {
+            if *val_cand > *val {
+                *val = *val_cand;
+            }
+        }
+    }
+    to_update
+}
+
+fn to_game_coalesced(game: &Game) -> GameCoalesed {
+    let empty_cube_hashmap = HashMap::from([
+        ("blue".to_string(), 0),
+        ("red".to_string(), 0),
+        ("green".to_string(), 0),
+    ]);
+    GameCoalesed {
+        id: game.id,
+        cube: Cube {
+            cube: game
+                .cubes
+                .iter()
+                .fold(empty_cube_hashmap, |acc, cube| update_hashmap(acc, &cube)),
+        },
+    }
+}
+
+fn product(game: &GameCoalesed) -> u32 {
+    game.cube
+        .cube
+        .keys()
+        .fold(1, |acc, key| acc * game.cube.cube.get(key).unwrap())
+}
+
+fn part2(input: &str) -> u32 {
+    if let Ok((_, games)) = games_parser(input) {
+        games
+            .iter()
+            .map(|game| to_game_coalesced(game))
+            .map(|game| product(&game))
+            .sum()
+    } else {
+        0
+    }
 }
 
 type CustomizedResult<T> = Result<T, Box<dyn std::error::Error>>;
@@ -392,7 +444,7 @@ mod tests {
     fn sample_test2() -> TestResult<()> {
         let input =
             std::fs::read_to_string("/home/pawel/Work/my-advent-of-code/2023/2/sample1.txt")?;
-        assert_eq!(2, part2(&input));
+        assert_eq!(2286, part2(&input));
         Ok(())
     }
 }
