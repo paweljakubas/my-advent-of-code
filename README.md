@@ -15,9 +15,5 @@ cat input.txt | stack solution.hs "part2"
 // before you run first time: cargo install rust-script
 rust-script --test solution.rs
 rust-script solution.rs input.txt part1
-```
-
-### Running Julia code
-```
-TODO
+rust-script solution.rs input.txt part2
 ```
