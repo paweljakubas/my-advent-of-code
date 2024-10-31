@@ -92,15 +92,6 @@ NB.    >1{processLine 'Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green'
 NB. 4 3 0
 NB. 1 6 2
 NB. 0 0 2
-NB.    checkGame >1{processLine 'Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green'
-NB. 1 1 1
-
-   checkGame=: 3 : 0
-*/ {{ */ y <: limit }}"1 y
-)
-
-NB.    checkGame >1{processLine 'Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green'
-NB. 1
 
    limit=: 12,14,13
    
@@ -146,3 +137,16 @@ NB. 8
    input=: fread jpath '/home/pawel/Work/Personal/my-advent-of-code/2023/2/input.txt'
    part1=: +/ (0$0)]F..filterIds processLine&.> <;._2 input
 NB. 2085 OK
+
+   minCardProduct=: 3 : 0
+'id cards'=. >y
+*/ >./ cards
+)
+
+NB.    minCardProduct"0 processLine&.> <;._2 sample
+NB. 48 12 1560 630 36
+NB.    +/ minCardProduct"0 processLine&.> <;._2 sample
+NB. 2286
+
+   part2=: +/ minCardProduct"0 processLine&.> <;._2 input
+NB. 79315 OK
