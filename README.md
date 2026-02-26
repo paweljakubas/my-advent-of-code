@@ -1,8 +1,8 @@
 ### Running Haskell code
 ```
-stack solution.hs "tests"
-cat input.txt | stack solution.hs "part1"
-cat input.txt | stack solution.hs "part2"
+//stack solution.hs "tests"
+cabal run solution.hs -- "part1" < input.txt
+cabal run solution.hs -- "part2" < input.txt
 ```
 
 ### Running J code (after entering jconsole)

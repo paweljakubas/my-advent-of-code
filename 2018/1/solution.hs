@@ -1,5 +1,8 @@
-#!/usr/bin/env stack
--- stack --resolver lts-18.13 script
+{- cabal:
+build-depends: base, containers
+-}
+
+#!/usr/bin/env runhaskell
 
 import qualified Data.Set           as Set
 import           System.Environment (getArgs)
@@ -42,4 +45,3 @@ f s l = case l of
   h : t -> if Set.member h s
     then Just h
     else f (Set.insert h s) t
-
