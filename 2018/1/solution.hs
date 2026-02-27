@@ -1,7 +1,3 @@
-{- cabal:
-build-depends: base, containers
--}
-
 #!/usr/bin/env runhaskell
 
 import qualified Data.Set           as Set

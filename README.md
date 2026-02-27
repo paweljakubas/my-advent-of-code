@@ -1,8 +1,12 @@
 ### Running Haskell code
 ```
-//stack solution.hs "tests"
-cabal run solution.hs -- "part1" < input.txt
-cabal run solution.hs -- "part2" < input.txt
+// source ghcup env first: source ~/.ghcup/env
+// run from the project directory (e.g., 2018/1/)
+// Per-project: run `gen-hie > hie.yaml` in each directory with a `.cabal` file.
+// myproject.cabal needs to be there
+// run `cabal clean` before committing
+cabal run myproject -- "part1" < input.txt
+cabal run myproject -- "part2" < input.txt
 ```
 
 ### Running J code (after entering jconsole)

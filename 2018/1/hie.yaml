@@ -1,0 +1,4 @@
+cradle:
+  cabal:
+    - path: "./solution.hs"
+      component: "myproject:exe:myproject"

@@ -1,0 +1,7 @@
+cabal-version: 3.0
+name: myproject
+version: 0.1.0.0
+executable myproject
+  main-is: solution.hs
+  build-depends: base >=4.19 && <5, containers
+  default-language: Haskell2010
